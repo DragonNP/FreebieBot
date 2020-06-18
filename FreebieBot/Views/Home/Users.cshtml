@@ -1,0 +1,11 @@
+﻿@model IEnumerable<FreebieBot.Models.User>
+@{
+    ViewBag.Title = "Users";
+}
+<table class="table">
+    <tr><td>Id</td><td> Телеграмм Id</td><td> Имя</td><td> Язык</td><td> Pikabu</td></tr>
+    @foreach (var item in Model)
+    {
+        <tr><td>@item.Id</td><td>@item.TelegramId</td><td>@item.Name</td><td>@item.Lang</td><td>@item.IsSubPikabu</td></tr>
+    }
+</table>

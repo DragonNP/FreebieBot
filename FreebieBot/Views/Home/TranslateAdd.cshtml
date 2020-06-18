@@ -1,0 +1,21 @@
+﻿@model FreebieBot.Models.Line
+@{
+    ViewBag.Title = "Adding translate";
+}
+<form asp-action="TranslateSave" asp-controller="home">
+    <div class="form-group">
+        <label asp-for="Id" class="control-label">Name</label>
+        <input type="text" asp-for="Id" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Default" class="control-label">Default</label>
+        <input type="text" asp-for="Default" class="form-control" />
+    </div>
+        <div class="form-group">
+            <label asp-for="LineRus" class="control-label">Rus</label>
+            <input type="text" asp-for="LineRus" class="form-control" />
+        </div>
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-default" />
+    </div>
+</form>

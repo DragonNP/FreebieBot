@@ -1,8 +1,10 @@
 ﻿using System.Threading.Tasks;
 using FreebieBot.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Telegram.Bot.Types;
+using User = FreebieBot.Models.User;
 
 namespace FreebieBot.Controllers
 {
@@ -10,6 +12,12 @@ namespace FreebieBot.Controllers
     public class MessageController : Controller
     {
         private static readonly ILogger Logger = Log.CreateLogger<Bot>();
+        private readonly DatabaseContext _db;
+
+        public MessageController(DatabaseContext db)
+        {
+            _db = db;
+        }
         
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Update update)
@@ -26,7 +34,7 @@ namespace FreebieBot.Controllers
             {
                 if (command.Contains(message))
                 {
-                    await command.Execute(message, botClient);
+                    await command.Execute(message, botClient, _db);
                     break;
                 }
             }
