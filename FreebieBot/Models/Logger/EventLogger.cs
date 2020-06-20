@@ -23,40 +23,6 @@ namespace FreebieBot.Models.Logger
             _className = typeof(T).Name;
         }
 
-        /// <summary>
-        /// Logs Event To DataBase.
-        /// </summary>
-        /// <param name="type">Type of event. Use "Error" or "Info".</param>
-        /// <param name="message">Message about event.</param>
-        /// <param name="location">Where this event happend.</param>
-        /// <param name="exception">If have exception pass it. Can be nullable.</param>
-        /// <param name="userId">Current user ID. Can be nullable.</param>
-        public void Log(string type, string message, string location, Exception exception = null,
-            string userId = null)
-        {
-            _db.EventLogs.Add(new EventLog()
-            {
-                Type = type,
-                Message = message,
-                Location = location,
-                StackTrace = exception?.ToString(),
-                UserID = userId ?? null,
-                DateTime = DateTime.Now
-            });
-            _db.SaveChanges();
-        }
-
-        public void LogCritical(Exception e, string userId = null, [CallerMemberName] string methodName = "")
-        {
-            if (LoggerLevel.crit < _level)
-                return;
-            
-            var location = $"{_className} -> {methodName}";
-
-            PrintLog(LoggerLevel.crit, e.Message, location, userId);
-            SaveToDatabase("Critical", e.Message, location, e.StackTrace, userId);
-        }
-
         public void LogError(Exception e, string userId = null, [CallerMemberName] string methodName = "")
         {
             if (LoggerLevel.fail < _level)

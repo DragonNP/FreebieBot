@@ -31,7 +31,7 @@ namespace FreebieBot
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogger logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogger logger)
         {
             Log.Logger = logger;
 
@@ -60,7 +60,7 @@ namespace FreebieBot
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             
-            await Bot.GetBotClientAsync();
+            Bot.GetBotClientAsync().Wait();
         }
     }
 }

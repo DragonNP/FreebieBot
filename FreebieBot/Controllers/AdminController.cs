@@ -98,9 +98,8 @@ namespace FreebieBot.Controllers
         public async Task<IActionResult> EventLogClear()
         {
             _eventLogger.LogInfo("Clearing Event Logs");
-            
-            _db.EventLogs.RemoveRange(_db.EventLogs);
-            await _db.SaveChangesAsync();
+
+            await _db.Database.ExecuteSqlRawAsync("Truncate table EventLogs");
             return RedirectToAction("EventLog");
         }
 
