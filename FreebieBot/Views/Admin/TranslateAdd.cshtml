@@ -1,11 +1,11 @@
-﻿@model FreebieBot.Models.Line
+﻿@model FreebieBot.Models.Database.Line
 @{
     ViewBag.Title = "Adding translate";
 }
-<form asp-action="TranslateSave" asp-controller="home">
+<form asp-action="TranslateAdd" asp-controller="admin">
     <div class="form-group">
-        <label asp-for="Id" class="control-label">Name</label>
-        <input type="text" asp-for="Id" class="form-control" />
+        <label asp-for="Name" class="control-label">Name</label>
+        <input type="text" asp-for="Name" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="Default" class="control-label">Default</label>
@@ -16,6 +16,6 @@
             <input type="text" asp-for="LineRus" class="form-control" />
         </div>
     <div class="form-group">
-        <input type="submit" value="Save" class="btn btn-default" />
+        <input type="submit" value="Save" class="btn btn-outline-info" />
     </div>
 </form>

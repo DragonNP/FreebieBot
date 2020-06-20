@@ -1,60 +1,29 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using FreebieBot.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using FreebieBot.Services;
 
 namespace FreebieBot.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly DatabaseContext _db;
+        private readonly EventLogService _evenLogger;
 
-        public HomeController(ILogger<HomeController> logger, DatabaseContext db)
+        public HomeController(EventLogService evenLogger)
         {
-            _logger = logger;
-            _db = db;
+            _evenLogger = evenLogger;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
+            _evenLogger.LogDebug("/Home/Index page visited", "HomeController -> Index");
+            
             return View();
         }
 
         public IActionResult Privacy()
         {
+            _evenLogger.LogDebug("/Home/Privacy page visited", "HomeController -> Privacy");
+            
             return View();
-        }
-        
-        public async Task<IActionResult> Users()
-        {
-            return View(await _db.Users.ToListAsync());
-        }
-        
-        public async Task<IActionResult> TranslateView()
-        {
-            return View(await _db.Lines.ToListAsync());
-        }
-        
-        public IActionResult TranslateAdd()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> TranslateSave(Line line)
-        {
-            _db.Lines.Add(line);
-            await _db.SaveChangesAsync();
-            return RedirectToAction("TranslateView");
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
 }

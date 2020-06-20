@@ -1,0 +1,23 @@
+﻿@model IEnumerable<FreebieBot.Models.Database.User>
+@{
+    ViewBag.Title = "Users";
+}
+<table class="table">
+    <tr><td>ID</td><td> Telegram ID</td><td> Name</td><td> Language</td><td> Sub on Pikabu</td><td> Role</td><td> Manage</td></tr>
+    @foreach (var user in Model)
+    {
+        <tr><td>@user.Id</td>
+            <td>@user.TelegramId</td>
+            <td>@user.Name</td>
+            <td>@user.Lang</td>
+            <td>@user.SubPikabu</td>
+            <td>@user.Role</td>
+            <td>
+                <form asp-action="UserDelete" asp-controller="Admin" asp-route-id="@user.Id" method="post">
+                     <a asp-action="UserEdit" asp-controller="Admin" asp-route-id="@user.Id" class="btn btn-outline-info">Edit</a>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form> 
+            </td>
+            </tr>
+    }
+</table>

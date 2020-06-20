@@ -1,0 +1,22 @@
+﻿@model IEnumerable<FreebieBot.Models.Database.Line>
+@{
+    ViewBag.Title = "Translate";
+}
+<a asp-action="TranslateAdd" class="btn btn-outline-info">Add translate</a>
+<table class="table">
+    <tr><td>Name</td><td> Default</td><td> Russian</td><td> Manage</td></tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Default</td>
+            <td>@item.LineRus</td>
+            <td>
+                <form asp-action="TranslateDelete" asp-controller="Admin" asp-route-name="@item.Name" method="post">
+                     <a asp-action="TranslateEdit" asp-controller="Admin" asp-route-name="@item.Name" class="btn btn-outline-info">Edit</a>
+                    <button type="submit" class="btn btn-outline-danger">Delete</button>
+                </form> 
+            </td>
+        </tr>
+    }
+</table>

@@ -1,12 +1,14 @@
-using System;
 using FreebieBot.Models;
+using FreebieBot.Models.Database;
+using FreebieBot.Models.Logger;
+using FreebieBot.Models.TelegramBot;
+using FreebieBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace FreebieBot
 {
@@ -22,24 +24,25 @@ namespace FreebieBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connection = Environment.GetEnvironmentVariable("URL_DATABASE");
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseSqlServer(connection));
+                options.UseSqlServer(AppSettings.UrlDatabase));
+            
+            services.AddTransient<EventLogService>();
             services.AddControllersWithViews().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogService eventLogger)
         {
-            Log.LoggerFactory = loggerFactory;
-            
+            Log.EventLogger = eventLogger;
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Home/EventLog");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -58,7 +61,8 @@ namespace FreebieBot
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             
-            Bot.InitBotClient(env.IsDevelopment());
+            EventLogService.SetLevel(AppSettings.LoggerLevel);
+            Bot.GetBotClientAsync().Wait();
         }
     }
 }

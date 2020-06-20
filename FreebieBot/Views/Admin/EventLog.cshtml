@@ -1,0 +1,14 @@
+﻿@model IEnumerable<FreebieBot.Models.Database.EventLog>
+@{
+    ViewBag.Title = "Event Log";
+}
+<form asp-action="EventLogClear" asp-controller="admin" method="post">
+    <button type="submit" class="btn btn-outline-danger">Clear Event Logs</button>
+</form>
+<table class="table">
+    <tr><td>EventId</td><td> Type</td><td> Message</td><td> Location</td><td> StackTrace</td><td> UserID</td><td> DateTime</td></tr>
+    @foreach (var item in Model)
+    {
+        <tr><td>@item.EventId</td><td>@item.Type</td><td>@item.Message</td><td>@item.Location</td><td>@item.StackTrace</td><td>@item.UserID</td><td>@item.DateTime</td></tr>
+    }
+</table>
