@@ -1,6 +1,6 @@
 ﻿namespace FreebieBot.Models.Logger
 {
-    public enum EventLogLevel
+    public enum LoggerLevel
     {
         dbug, // Debug
         info, // Information

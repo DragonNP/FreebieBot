@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
-using FreebieBot.Services;
+using FreebieBot.Models.Logger;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -12,10 +12,10 @@ namespace FreebieBot.Models.TelegramBot.Commands
 {
     public class StartCommand : Command
     {
-        private readonly EventLogService _eventLogger;
+        private readonly EventLogger _eventLogger;
         public override string Name => @"/start";
 
-        public StartCommand(EventLogService eventLogger)
+        public StartCommand(EventLogger eventLogger)
         {
             _eventLogger = eventLogger;
         }
@@ -53,7 +53,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
             }
             catch (Exception e)
             {
-                _eventLogger.LogError(e, "StartCommand -> Execute", Convert.ToString(message.Chat.Id));
+                _eventLogger.LogError(e, Convert.ToString(message.Chat.Id));
             }
         }
     }

@@ -2,7 +2,6 @@ using FreebieBot.Models;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Logger;
 using FreebieBot.Models.TelegramBot;
-using FreebieBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -26,15 +25,15 @@ namespace FreebieBot
         {
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(AppSettings.UrlDatabase));
-            
-            services.AddTransient<EventLogService>();
+
+            services.AddTransient<EventLogger>();
             services.AddControllersWithViews().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogService eventLogger)
+        public async void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogger logger)
         {
-            Log.EventLogger = eventLogger;
+            Log.Logger = logger;
 
             if (env.IsDevelopment())
             {
@@ -61,8 +60,7 @@ namespace FreebieBot
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             
-            EventLogService.SetLevel(AppSettings.LoggerLevel);
-            Bot.GetBotClientAsync().Wait();
+            await Bot.GetBotClientAsync();
         }
     }
 }

@@ -1,37 +1,26 @@
 ﻿using System;
-using FreebieBot.Models;
+using System.Runtime.CompilerServices;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Logger;
 
-namespace FreebieBot.Services
+namespace FreebieBot.Models.Logger
 {
-    public class EventLogService
+    public class EventLogger
     {
-        private static EventLogLevel _level = EventLogLevel.fail;
-        private static DatabaseContext _db;
+        private DatabaseContext _db;
+        private LoggerLevel _level;
+        private string _className;
 
-        public EventLogService(DatabaseContext db)
+        public EventLogger(DatabaseContext db)
         {
             _db = db;
+            Enum.TryParse(AppSettings.LoggerLevel, out _level);
         }
 
-        public static void SetLevel(string level)
+        public void AddClass<T>()
+            where T : class
         {
-            switch (level)
-            {
-                case "debug":
-                    _level = EventLogLevel.dbug;
-                    break;
-                case "info":
-                    _level = EventLogLevel.info;
-                    break;
-                case "error":
-                    _level = EventLogLevel.fail;
-                    break;
-                case "critical":
-                    _level = EventLogLevel.crit;
-                    break;
-            }
+            _className = typeof(T).Name;
         }
 
         /// <summary>
@@ -42,7 +31,7 @@ namespace FreebieBot.Services
         /// <param name="location">Where this event happend.</param>
         /// <param name="exception">If have exception pass it. Can be nullable.</param>
         /// <param name="userId">Current user ID. Can be nullable.</param>
-        public void LogEvent(string type, string message, string location, Exception exception = null,
+        public void Log(string type, string message, string location, Exception exception = null,
             string userId = null)
         {
             _db.EventLogs.Add(new EventLog()
@@ -57,60 +46,68 @@ namespace FreebieBot.Services
             _db.SaveChanges();
         }
 
-        public void LogCritical(Exception e, string location, string userId = null)
+        public void LogCritical(Exception e, string userId = null, [CallerMemberName] string methodName = "")
         {
-            if (EventLogLevel.crit < _level)
+            if (LoggerLevel.crit < _level)
                 return;
             
-            PrintLog(EventLogLevel.crit, e.Message, location, userId);
+            var location = $"{_className} -> {methodName}";
+
+            PrintLog(LoggerLevel.crit, e.Message, location, userId);
             SaveToDatabase("Critical", e.Message, location, e.StackTrace, userId);
         }
 
-        public void LogError(Exception e, string location, string userId = null)
+        public void LogError(Exception e, string userId = null, [CallerMemberName] string methodName = "")
         {
-            if (EventLogLevel.fail < _level)
+            if (LoggerLevel.fail < _level)
                 return;
             
-            PrintLog(EventLogLevel.fail, e.Message, location, userId);
+            var location = $"{_className} -> {methodName}";
+            
+            PrintLog(LoggerLevel.fail, e.Message, location, userId);
             SaveToDatabase("Error", e.Message, location, e.StackTrace, userId);
         }
 
-        public void LogInfo(string message, string location, string userId = null)
+        public void LogInfo(string message, string userId = null, [CallerMemberName] string methodName = "")
         {
-            if (EventLogLevel.info < _level)
+            if (LoggerLevel.info < _level)
                 return;
             
-            PrintLog(EventLogLevel.info, message, location, userId);
+            var location = $"{_className} -> {methodName}";
+            
+            PrintLog(LoggerLevel.info, message, location, userId);
             SaveToDatabase("Information", message, location, userId: userId);
         }
 
-        public void LogDebug(string message, string location, string userId = null)
+        public void LogDebug(string message, string userId = null, [CallerMemberName] string methodName = "")
         {
-            if (EventLogLevel.dbug < _level)
+            if (LoggerLevel.dbug < _level)
                 return;
+
+            var location = $"{_className} -> {methodName}";
             
-            PrintLog(EventLogLevel.dbug, message, location, userId);
+            PrintLog(LoggerLevel.dbug, message, location, userId);
             SaveToDatabase("Debug", message, location, userId: userId);
         }
 
-        private static void PrintLog(EventLogLevel level, string message, string location, string userId = null)
+        private void PrintLog(LoggerLevel level, string message, string location, string userId = null)
         {
             ConsoleColor foregroundColor, backgroundColor;
             switch (level)
             {
-                case EventLogLevel.dbug:
+                case LoggerLevel.dbug:
                     foregroundColor = ConsoleColor.Gray;
                     backgroundColor = default;
                     break;
-                case EventLogLevel.info:
+                case LoggerLevel.info:
                     foregroundColor = ConsoleColor.Green;
                     backgroundColor = default;
                     break;
-                case EventLogLevel.fail:
+                case LoggerLevel.fail:
                     foregroundColor = ConsoleColor.White;
                     backgroundColor = ConsoleColor.Red;
                     break;
-                case EventLogLevel.crit:
+                case LoggerLevel.crit:
                     foregroundColor = ConsoleColor.Black;
                     backgroundColor = ConsoleColor.Red;
                     break;
@@ -135,7 +132,7 @@ namespace FreebieBot.Services
                 Console.WriteLine();
         }
 
-        private static void SaveToDatabase(string level, string message, string location,
+        private void SaveToDatabase(string level, string message, string location,
             string stackTrace = null, string userId = null)
         {
             _db.EventLogs.Add(new EventLog()

@@ -1,27 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using FreebieBot.Services;
+﻿using FreebieBot.Models.Logger;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FreebieBot.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly EventLogService _evenLogger;
+        private readonly EventLogger _eventLogger;
 
-        public HomeController(EventLogService evenLogger)
+        public HomeController(EventLogger eventLogger)
         {
-            _evenLogger = evenLogger;
+            _eventLogger = eventLogger;
+            _eventLogger.AddClass<HomeController>();
         }
 
         public IActionResult Index()
         {
-            _evenLogger.LogDebug("/Home/Index page visited", "HomeController -> Index");
+            _eventLogger.LogDebug("/Home/Index page visited");
             
             return View();
         }
 
         public IActionResult Privacy()
         {
-            _evenLogger.LogDebug("/Home/Privacy page visited", "HomeController -> Privacy");
+            _eventLogger.LogDebug("/Home/Privacy page visited");
             
             return View();
         }

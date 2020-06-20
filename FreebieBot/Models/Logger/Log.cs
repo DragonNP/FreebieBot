@@ -1,9 +1,7 @@
-﻿using FreebieBot.Services;
-
-namespace FreebieBot.Models.Logger
+﻿namespace FreebieBot.Models.Logger
 {
-    internal static class Log
+    public class Log
     {
-        public static EventLogService EventLogger { get; set; }
+        public static EventLogger Logger { get; set; }
     }
 }
