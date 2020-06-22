@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FreebieBot.Models.EventLogs;
+using FreebieBot.Models.Posts;
+using FreebieBot.Models.Translates;
+using FreebieBot.Models.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreebieBot.Models.Database
 {

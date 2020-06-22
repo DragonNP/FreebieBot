@@ -1,65 +1,67 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Text;
 using System.Web;
 using CsQuery;
 using FreebieBot.Models.Logger;
+using FreebieBot.Models.Posts;
 
 namespace FreebieBot.Models
 {
     public class Parser
     {
         private readonly EventLogger _eventLogger;
-        
-         public Parser(EventLogger eventLogger)
+        private CQ _stories;
+
+        public Parser(EventLogger eventLogger)
         {
             _eventLogger = eventLogger;
+            _eventLogger.AddClass<Parser>();
         }
-        
-        public PostPikabu ParsePikabu()
+
+        private void ParsePikabu()
         {
-            string urlAddress = "https://pikabu.ru/community/steam/new";
-            string data = "";
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlAddress);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                Stream receiveStream = response.GetResponseStream();
-                StreamReader readStream = null;
-
-                if (String.IsNullOrWhiteSpace(response.CharacterSet))
-                    readStream = new StreamReader(receiveStream);
-                else
-                    readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet));
-
-                data = readStream.ReadToEnd();
-
-                response.Close();
-                readStream.Close();
-            }
-            
             _eventLogger.LogInfo("Parsing site Pikabu");
-            var cq = CQ.Create(data);
+            const string urlAddress = "https://pikabu.ru/community/steam/new";
 
-            var storyId = Convert.ToInt64(cq.Find(".story")[0].GetAttribute("data-story-id"));
-            var a = cq.Find(".story a")[0];
-            var url = a.GetAttribute("href");
-            var name = HttpUtility.HtmlDecode(a.InnerText);
-            
-            _eventLogger.LogDebug(storyId == default ? "Not found first story id" : $"Story ID: {storyId}");
-            _eventLogger.LogDebug(string.IsNullOrEmpty(url) ? "Not found first url" : $"URL: {url}");
-            _eventLogger.LogDebug(string.IsNullOrEmpty(url) ? "Not found name" : $"Name: {name}");
-            
-            var post = new PostPikabu()
+            var cq = CQ.CreateFromUrl(urlAddress);
+
+            _stories = cq.Find(".stories-feed__container");
+        }
+
+        /// <summary>
+        /// Searching next post from Pikabu
+        /// </summary>
+        /// <returns>Post or null (posts ended)</returns>
+        public Post NextPikabuPost()
+        {
+            if (_stories == default)
+                ParsePikabu();
+
+            var story = _stories.Select(".story");
+
+            if (story[0].ClassName == "story story_tags-at-top")
+                return null;
+
+            var id = Convert.ToInt64(story[0].GetAttribute("data-story-id"));
+
+            var aElement = story.Find(".story__title-link")[0];
+            var name = HttpUtility.HtmlDecode(aElement.InnerText);
+            var url = aElement.GetAttribute("href");
+
+            var dateTime = DateTime.Parse(story.Find(".story__datetime")[0].GetAttribute("datetime"));
+
+            var post = new Post()
             {
-                Id = storyId,
+                Id = id,
                 Name = name,
-                Url = url
+                Url = url,
+                Type = PostType.Pikabu,
+                DateTime = dateTime
             };
-            
+
+            _eventLogger.LogDebug(id == default ? "Not found pikabu post" : $"Pikabu post Id: {id}");
+
+            story[0].Remove();
+
             return post;
         }
     }

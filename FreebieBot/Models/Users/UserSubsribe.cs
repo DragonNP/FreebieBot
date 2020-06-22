@@ -1,4 +1,4 @@
-﻿namespace FreebieBot.Models.Database
+﻿namespace FreebieBot.Models.Users
 {
     public enum UserSub
     {

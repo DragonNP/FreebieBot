@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
+using FreebieBot.Models.Users;
 using FreebieBot.Models.Logger;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using User = FreebieBot.Models.Database.User;
+using User = FreebieBot.Models.Users.User;
 
 namespace FreebieBot.Models.TelegramBot.Commands
 {
@@ -20,6 +21,11 @@ namespace FreebieBot.Models.TelegramBot.Commands
             _eventLogger = eventLogger;
         }
 
+        /// <summary>
+        /// If text from message == name command
+        /// </summary>
+        /// <param name="message">Message from user</param>
+        /// <returns></returns>
         public override bool Contains(Message message)
         {
             if (message.Type != MessageType.Text)
@@ -27,8 +33,15 @@ namespace FreebieBot.Models.TelegramBot.Commands
 
             return message.Text.Contains(Name);
         }
-
-        public override async Task Execute(Message message, TelegramBotClient botClient, ApplicationContext db)
+        
+        /// <summary>
+        /// Executing command 
+        /// </summary>
+        /// <param name="message">Message from user</param>
+        /// <param name="botClient">Bot Client</param>
+        /// <param name="context">DB Context</param>
+        /// <returns></returns>
+        public override async Task Execute(Message message, TelegramBotClient botClient, ApplicationContext context)
         {
             try
             {
@@ -39,14 +52,14 @@ namespace FreebieBot.Models.TelegramBot.Commands
 
                 // Add new user
                 var newUser = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
-                var line = db.Lines.Find("hello");
+                var line = context.Lines.Find("hello");
                 var helloText = lang == "ru" ? line.LineRus : line.Default;
-                var isNew = !db.Users.Any(p => p.TelegramId == chat.Id);
+                var isNew = !context.Users.Any(p => p.TelegramId == chat.Id);
                 
                 if (isNew)
                 {
-                    await db.Users.AddAsync(newUser);
-                    await db.SaveChangesAsync();
+                    await context.Users.AddAsync(newUser);
+                    await context.SaveChangesAsync();
                 }
                 
                 await botClient.SendTextMessageAsync(chat.Id, string.Format(helloText, newUser.Name));

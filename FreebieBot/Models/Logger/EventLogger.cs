@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using FreebieBot.Models.Database;
+using FreebieBot.Models.EventLogs;
 
 namespace FreebieBot.Models.Logger
 {
     public class EventLogger
     {
-        private ApplicationContext _db;
-        private LoggerLevel _level;
+        private readonly ApplicationContext _db;
+        private readonly LoggerLevel _level;
         private string _className;
 
         public EventLogger(ApplicationContext db)
@@ -16,12 +17,22 @@ namespace FreebieBot.Models.Logger
             Enum.TryParse(AppSettings.LoggerLevel, out _level);
         }
 
+        /// <summary>
+        /// Adding Class for logging
+        /// </summary>
+        /// <typeparam name="T">Class</typeparam>
         public void AddClass<T>()
             where T : class
         {
             _className = typeof(T).Name;
         }
 
+        /// <summary>
+        /// Logging error
+        /// </summary>
+        /// <param name="e">Error</param>
+        /// <param name="userId">User Id (optional)</param>
+        /// <param name="methodName">Name caller method (optional)</param>
         public void LogError(Exception e, string userId = null, [CallerMemberName] string methodName = "")
         {
             if (LoggerLevel.fail < _level)
@@ -33,6 +44,12 @@ namespace FreebieBot.Models.Logger
             SaveToDatabase("Error", e.Message, location, e.StackTrace, userId);
         }
 
+        /// <summary>
+        /// Logging info
+        /// </summary>
+        /// <param name="message">Message for logging</param>
+        /// <param name="userId">User Id (optional)</param>
+        /// <param name="methodName">Name caller method (optional)</param>
         public void LogInfo(string message, string userId = null, [CallerMemberName] string methodName = "")
         {
             if (LoggerLevel.info < _level)
@@ -44,6 +61,12 @@ namespace FreebieBot.Models.Logger
             SaveToDatabase("Information", message, location, userId: userId);
         }
 
+        /// <summary>
+        /// Logging debug
+        /// </summary>
+        /// <param name="message">Debug message for logging</param>
+        /// <param name="userId">User Id (optional)</param>
+        /// <param name="methodName">Name caller method (optional)</param>
         public void LogDebug(string message, string userId = null, [CallerMemberName] string methodName = "")
         {
             if (LoggerLevel.dbug < _level)
@@ -55,6 +78,7 @@ namespace FreebieBot.Models.Logger
             SaveToDatabase("Debug", message, location, userId: userId);
         }
 
+        // Writing log to Console
         private void PrintLog(LoggerLevel level, string message, string location, string userId = null)
         {
             ConsoleColor foregroundColor, backgroundColor;
@@ -70,10 +94,6 @@ namespace FreebieBot.Models.Logger
                     break;
                 case LoggerLevel.fail:
                     foregroundColor = ConsoleColor.White;
-                    backgroundColor = ConsoleColor.Red;
-                    break;
-                case LoggerLevel.crit:
-                    foregroundColor = ConsoleColor.Black;
                     backgroundColor = ConsoleColor.Red;
                     break;
                 default:
@@ -97,6 +117,7 @@ namespace FreebieBot.Models.Logger
                 Console.WriteLine();
         }
 
+        // Saving log to database
         private void SaveToDatabase(string level, string message, string location,
             string stackTrace = null, string userId = null)
         {

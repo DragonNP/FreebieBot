@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
+using FreebieBot.Models.Users;
 using FreebieBot.Models.Logger;
+using FreebieBot.Models.Translates;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,14 +26,14 @@ namespace FreebieBot.Controllers
         [HttpGet]
         public async Task<IActionResult> Translate()
         {
-            _eventLogger.LogDebug("/Home/TranslateView page visited");
+            _eventLogger.LogDebug("/Admin/TranslateView page visited");
             return View(await _context.Lines.ToListAsync());
         }
         
         [HttpGet]
         public IActionResult TranslateAdd()
         {
-            _eventLogger.LogDebug("/Home/TranslateAdd page visited");
+            _eventLogger.LogDebug("/Admin/TranslateAdd page visited");
             return View();
         }
         
@@ -65,7 +67,7 @@ namespace FreebieBot.Controllers
         [HttpGet]
         public async Task<IActionResult> TranslateEdit(string name)
         {
-            _eventLogger.LogDebug("/Home/TranslateEdit page visited");
+            _eventLogger.LogDebug("/Admin/TranslateEdit page visited");
             
             var line = await _context.Lines.FindAsync(name);
             
@@ -90,7 +92,7 @@ namespace FreebieBot.Controllers
         [HttpGet]
         public async Task<IActionResult> EventLog()
         {
-            _eventLogger.LogDebug("/Home/EventLog page visited");
+            _eventLogger.LogDebug("/Admin/EventLog page visited");
             return View(await _context.EventLogs.ToListAsync());
         }
         
@@ -106,14 +108,17 @@ namespace FreebieBot.Controllers
         [HttpGet]
         public async Task<IActionResult> Users()
         {
-            _eventLogger.LogDebug("/Home/Users page visited");
-            return View(await _context.Users.ToListAsync());
+            _eventLogger.LogDebug("/Admin/Users page visited");
+
+            var users = await _context.Users.ToListAsync();
+            
+            return View(users);
         }
 
         [HttpGet]
         public async Task<IActionResult> UserEdit(string id)
         {
-            _eventLogger.LogDebug("/Home/UserEdit page visited", id);
+            _eventLogger.LogDebug("/Admin/UserEdit page visited", id);
             
             var user = await _context.Users.FindAsync(Convert.ToInt64(id));
 
@@ -150,6 +155,16 @@ namespace FreebieBot.Controllers
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
             return RedirectToAction("Users");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Posts()
+        {
+            _eventLogger.LogDebug("/Admin/Posts page visited");
+            
+            var posts = await _context.Posts.ToListAsync();
+            
+            return View(posts);
         }
     }
 }

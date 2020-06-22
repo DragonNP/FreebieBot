@@ -12,16 +12,23 @@ namespace FreebieBot.Models.TelegramBot
     {
         private static TelegramBotClient _botClient;
         private static List<Command> _commandsList;
-        private static readonly EventLogger EventLogger = Log.Logger;
+        private static EventLogger _eventLogger;
 
         public static IReadOnlyList<Command> Commands => _commandsList.AsReadOnly();
 
-        public static async Task<TelegramBotClient> GetBotClientAsync()
+        /// <summary>
+        /// Initialization Telegram Bot
+        /// </summary>
+        /// <param name="logger">EventLogger</param>
+        /// <returns>None</returns>
+        public static async Task Initialization(EventLogger logger)
         {
             if(_botClient != null)
-                return _botClient;
+                return;
             
-            EventLogger.AddClass<Bot>();
+            _eventLogger = logger;
+            _eventLogger.AddClass<Bot>();
+            
             InitCommandsList();
 
             try
@@ -30,7 +37,7 @@ namespace FreebieBot.Models.TelegramBot
                 {
                     _botClient = new TelegramBotClient(AppSettings.TelegramToken);
                     
-                    EventLogger.LogInfo("Bot using only WebHook");
+                    _eventLogger.LogInfo("Bot using only WebHook");
                 }
                 else
                 {
@@ -38,7 +45,7 @@ namespace FreebieBot.Models.TelegramBot
                     var proxy = new HttpToSocks5Proxy(AppSettings.ProxyHost, AppSettings.ProxyPort);
                     _botClient = new TelegramBotClient(AppSettings.TelegramToken, proxy);
 
-                    EventLogger.LogInfo("Bot using WebHook and proxy");
+                    _eventLogger.LogInfo("Bot using WebHook and proxy");
                 }
 
                 // Using WebHook
@@ -48,22 +55,29 @@ namespace FreebieBot.Models.TelegramBot
 
                 // Logging
                 var me = _botClient.GetMeAsync().Result;
-                EventLogger.LogDebug($"Bot id {me.Id}. Bot name {me.FirstName}");
+                _eventLogger.LogDebug($"Bot id {me.Id}. Bot name {me.FirstName}");
 
-                return _botClient;
             }
             catch (Exception e)
             {
-                EventLogger.LogError(e);
+                _eventLogger.LogError(e);
             }
-
-            return null;
+        }
+        
+        /// <summary>
+        /// Getting telegram bot client
+        /// </summary>
+        /// <returns>Telegram Bot</returns>
+        public static TelegramBotClient GetBotClient()
+        {
+            return _botClient;
         }
 
+        // Initialization commands
         private static void InitCommandsList()
         {
             _commandsList = new List<Command>();
-            _commandsList.Add(new StartCommand(EventLogger));
+            _commandsList.Add(new StartCommand(_eventLogger));
             //TODO: Add more commands
         }
     }

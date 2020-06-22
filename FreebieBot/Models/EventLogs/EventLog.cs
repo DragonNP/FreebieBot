@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace FreebieBot.Models.Database
+namespace FreebieBot.Models.EventLogs
 {
     public class EventLog
     {

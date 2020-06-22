@@ -33,7 +33,7 @@ namespace FreebieBot.Controllers
             try
             {
                 var commands = Bot.Commands;
-                var botClient = Bot.GetBotClientAsync();
+                var botClient = Bot.GetBotClient();
 
                 _eventLogger.LogDebug($"Received {message.Type}", message.From.Id.ToString());
 
@@ -41,7 +41,7 @@ namespace FreebieBot.Controllers
                 {
                     if (command.Contains(message))
                     {
-                        await command.Execute(message, await botClient, _context);
+                        await command.Execute(message, botClient, _context);
                         break;
                     }
                 }

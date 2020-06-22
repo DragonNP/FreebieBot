@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FreebieBot.Models.Database
+namespace FreebieBot.Models.Posts
 {
     public class Post
     {
@@ -8,8 +8,10 @@ namespace FreebieBot.Models.Database
         
         public string Name { get; set; }
         
-        public DateTime DateTime { get; set; }
+        public string Url { get; set; }
         
         public PostType Type { get; set; }
+        
+        public DateTime DateTime { get; set; }
     }
 }

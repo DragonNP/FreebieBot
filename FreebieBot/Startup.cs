@@ -1,4 +1,3 @@
-using System.Timers;
 using FreebieBot.Models;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Logger;
@@ -25,21 +24,19 @@ namespace FreebieBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Adding Database context
+            // Database Context
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(AppSettings.UrlDatabase));
 
-            // Adding Custom Logger
-            services.AddTransient<EventLogger>();
-            services.AddHostedService<FreebieHostedService>();
+            services.AddScoped<EventLogger>(); // Logger
+            services.AddTransient<Parser>(); // Parser for FreebieHostedService
+            services.AddHostedService<FreebieHostedService>(); // Search freebies 
             services.AddControllersWithViews().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogger logger)
         {
-            Log.Logger = logger;
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -65,7 +62,8 @@ namespace FreebieBot
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
             
-            Bot.GetBotClientAsync().Wait();
+            // Initializing the bot for sending and receiving messages
+            Bot.Initialization(logger).Wait();
         }
     }
 }

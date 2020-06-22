@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FreebieBot.Models.Database
+namespace FreebieBot.Models.Translates
 {
     public class Line
     {

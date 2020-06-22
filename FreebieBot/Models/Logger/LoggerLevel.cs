@@ -5,6 +5,5 @@
         dbug, // Debug
         info, // Information
         fail, // Error
-        crit // Critical Error
     }
 }
