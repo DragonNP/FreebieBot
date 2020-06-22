@@ -1,33 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using FreebieBot.Models.Logger;
+using FreebieBot.Models;
 using FreebieBot.Models.TelegramBot.Commands;
 using MihaZupan;
 using Telegram.Bot;
 
-namespace FreebieBot.Models.TelegramBot
+namespace FreebieBot.Services
 {
-    public class Bot
+    public class TelegramBotService
     {
         private static TelegramBotClient _botClient;
         private static List<Command> _commandsList;
-        private static EventLogger _eventLogger;
+        private static EventLoggerService _eventLogger;
 
-        public static IReadOnlyList<Command> Commands => _commandsList.AsReadOnly();
+        public IReadOnlyList<Command> Commands => _commandsList.AsReadOnly();
 
         /// <summary>
         /// Initialization Telegram Bot
         /// </summary>
         /// <param name="logger">EventLogger</param>
         /// <returns>None</returns>
-        public static async Task Initialization(EventLogger logger)
+        public TelegramBotService(EventLoggerService logger)
         {
             if(_botClient != null)
                 return;
             
             _eventLogger = logger;
-            _eventLogger.AddClass<Bot>();
+            _eventLogger.AddClass<TelegramBotService>();
             
             InitCommandsList();
 
@@ -51,7 +50,7 @@ namespace FreebieBot.Models.TelegramBot
                 // Using WebHook
                 var url = Environment.GetEnvironmentVariable("URL_ENVIRONMENT");
                 var hook = $"{url}/api/message/update";
-                await _botClient.SetWebhookAsync(hook);
+                _botClient.SetWebhookAsync(hook);
 
                 // Logging
                 var me = _botClient.GetMeAsync().Result;
@@ -68,8 +67,10 @@ namespace FreebieBot.Models.TelegramBot
         /// Getting telegram bot client
         /// </summary>
         /// <returns>Telegram Bot</returns>
-        public static TelegramBotClient GetBotClient()
+        public TelegramBotClient GetBotClient()
         {
+            if (_botClient == null)
+                throw new Exception("Telegram bot service not initialized");
             return _botClient;
         }
 

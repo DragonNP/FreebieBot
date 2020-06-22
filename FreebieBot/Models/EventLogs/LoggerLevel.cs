@@ -1,4 +1,4 @@
-﻿namespace FreebieBot.Models.Logger
+﻿namespace FreebieBot.Models.EventLogs
 {
     public enum LoggerLevel
     {

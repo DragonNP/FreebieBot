@@ -6,30 +6,28 @@ using System.Threading.Tasks;
 using FreebieBot.Models;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Users;
-using FreebieBot.Models.Logger;
 using FreebieBot.Models.Posts;
-using FreebieBot.Models.TelegramBot;
 using FreebieBot.Models.Translates;
 using Microsoft.Extensions.Hosting;
+using Telegram.Bot;
 
 namespace FreebieBot.Services
 {
     public class FreebieHostedService : IHostedService, IDisposable
     {
-        private readonly EventLogger _logger;
+        private readonly EventLoggerService _logger;
         private readonly ApplicationContext _context;
         private Timer _timer;
-        private readonly SendTelegramMessage _sendTelegramMessage;
+        private readonly TelegramBotClient _telegramBot;
 
-        public FreebieHostedService(EventLogger logger, ApplicationContext context)
+        public FreebieHostedService(EventLoggerService logger, ApplicationContext context, TelegramBotService telegramBot)
         {
             _logger = logger;
             _context = context;
+            _telegramBot = telegramBot.GetBotClient();
             
-            // Initialization of logger
+            // Initializations
             _logger.AddClass<FreebieHostedService>();
-            // Initialization of SendTelegramMessage
-            _sendTelegramMessage = new SendTelegramMessage(_logger);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -80,11 +78,23 @@ namespace FreebieBot.Services
                 postPikabu = parser.NextPikabuPost();
             }
 
+            if (pikabuFreebies.Count == 0) return;
             // Searching users with Pikabu subscription
             var users = _context.Users.Where(p => p.SubPikabu == UserSub.Yes);
-            _sendTelegramMessage.SendMore(users, pikabuFreebies);
+            SendTelegramMessage(users, pikabuFreebies);
             
             _context.SaveChangesAsync(); // Saving updates to database
+        }
+
+        private void SendTelegramMessage(IQueryable<User> users, List<Line> lines)
+        {
+            foreach (var user in users)
+            {
+                foreach (var line in lines)
+                {
+                    _telegramBot.SendTextMessageAsync(user.Id, user.Lang == UserLang.def ? line.Default : line.LineRus);
+                }
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

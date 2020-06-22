@@ -2,8 +2,8 @@
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Users;
-using FreebieBot.Models.Logger;
 using FreebieBot.Models.Translates;
+using FreebieBot.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +11,10 @@ namespace FreebieBot.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly EventLogger _eventLogger;
+        private readonly EventLoggerService _eventLogger;
         private readonly ApplicationContext _context;
 
-        public AdminController(ApplicationContext context, EventLogger eventLogger)
+        public AdminController(ApplicationContext context, EventLoggerService eventLogger)
         {
             _eventLogger = eventLogger;
             _eventLogger.AddClass<AdminController>();

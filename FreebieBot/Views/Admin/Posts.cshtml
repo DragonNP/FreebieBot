@@ -2,9 +2,8 @@
 @{
     ViewBag.Title = "Posts";
 }
-<a asp-action="TranslateAdd" class="btn btn-outline-info">Add translate</a>
 <table class="table">
-    <tr><td>ID</td><td> Name</td><td> Url</td><td> Type</td><td> DateTime</td></tr>
+    <tr><td>Id</td><td> Name</td><td> Url</td><td> Type</td><td> Time</td></tr>
     @foreach (var item in Model)
     {
         <tr>

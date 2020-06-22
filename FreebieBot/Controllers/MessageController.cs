@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
-using FreebieBot.Models.Logger;
-using FreebieBot.Models.TelegramBot;
+using FreebieBot.Services;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot.Types;
 
@@ -11,13 +10,15 @@ namespace FreebieBot.Controllers
     [Route("/api/message/update")]
     public class MessageController : Controller
     {
-        private readonly EventLogger _eventLogger;
+        private readonly EventLoggerService _eventLogger;
         private readonly ApplicationContext _context;
+        private readonly TelegramBotService _telegramBot;
 
-        public MessageController(ApplicationContext context, EventLogger eventLogger)
+        public MessageController(ApplicationContext context, EventLoggerService eventLogger, TelegramBotService telegramBot)
         {
             _eventLogger = eventLogger;
             _context = context;
+            _telegramBot = telegramBot;
 
             _eventLogger.AddClass<MessageController>();
             _eventLogger.LogDebug("Initialization MessageController");
@@ -32,18 +33,17 @@ namespace FreebieBot.Controllers
             
             try
             {
-                var commands = Bot.Commands;
-                var botClient = Bot.GetBotClient();
+                var commands = _telegramBot.Commands;
+                var telegramBot = _telegramBot.GetBotClient();
 
                 _eventLogger.LogDebug($"Received {message.Type}", message.From.Id.ToString());
 
                 foreach (var command in commands)
                 {
-                    if (command.Contains(message))
-                    {
-                        await command.Execute(message, botClient, _context);
-                        break;
-                    }
+                    if (!command.Contains(message)) continue;
+                    
+                    await command.Execute(message, telegramBot, _context);
+                    break;
                 }
             }
             catch (Exception e)

@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Web;
 using CsQuery;
-using FreebieBot.Models.Logger;
 using FreebieBot.Models.Posts;
+using FreebieBot.Services;
 
 namespace FreebieBot.Models
 {
     public class Parser
     {
-        private readonly EventLogger _eventLogger;
+        private readonly EventLoggerService _eventLogger;
         private CQ _stories;
 
-        public Parser(EventLogger eventLogger)
+        public Parser(EventLoggerService eventLogger)
         {
             _eventLogger = eventLogger;
             _eventLogger.AddClass<Parser>();

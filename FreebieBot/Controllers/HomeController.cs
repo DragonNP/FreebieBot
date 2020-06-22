@@ -1,13 +1,13 @@
-﻿using FreebieBot.Models.Logger;
+﻿using FreebieBot.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FreebieBot.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly EventLogger _eventLogger;
+        private readonly EventLoggerService _eventLogger;
 
-        public HomeController(EventLogger eventLogger)
+        public HomeController(EventLoggerService eventLogger)
         {
             _eventLogger = eventLogger;
             _eventLogger.AddClass<HomeController>();

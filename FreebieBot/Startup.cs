@@ -1,6 +1,5 @@
 using FreebieBot.Models;
 using FreebieBot.Models.Database;
-using FreebieBot.Models.Logger;
 using FreebieBot.Models.TelegramBot;
 using FreebieBot.Services;
 using Microsoft.AspNetCore.Builder;
@@ -28,14 +27,15 @@ namespace FreebieBot
             services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(AppSettings.UrlDatabase));
 
-            services.AddScoped<EventLogger>(); // Logger
+            services.AddScoped<EventLoggerService>(); // Logger
+            services.AddSingleton<TelegramBotService>(); // Telegram Bot
             services.AddTransient<Parser>(); // Parser for FreebieHostedService
             services.AddHostedService<FreebieHostedService>(); // Search freebies 
             services.AddControllersWithViews().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLogger logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, EventLoggerService logger)
         {
             if (env.IsDevelopment())
             {
@@ -61,9 +61,6 @@ namespace FreebieBot
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-            
-            // Initializing the bot for sending and receiving messages
-            Bot.Initialization(logger).Wait();
         }
     }
 }
