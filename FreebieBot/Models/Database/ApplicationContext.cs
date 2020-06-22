@@ -2,12 +2,13 @@
 
 namespace FreebieBot.Models.Database
 {
-    public sealed class DatabaseContext : DbContext
+    public sealed class ApplicationContext : DbContext
     {
         public DbSet<User> Users { get; set; } // Database for users
         public DbSet<Line> Lines { get; set; } // Database for translates
         public DbSet<EventLog> EventLogs { get; set; } // Database for Event Logs
-        public DatabaseContext(DbContextOptions<DatabaseContext> options)
+        public DbSet<Post> Posts { get; set; } // Database for freebie
+        public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
             Database.EnsureCreated();

@@ -11,15 +11,17 @@ namespace FreebieBot.Controllers
     [Route("/api/message/update")]
     public class MessageController : Controller
     {
-        private static readonly EventLogger EventLogger = Log.Logger;
-        private readonly DatabaseContext _db;
+        private readonly EventLogger _eventLogger;
+        private readonly ApplicationContext _context;
 
-        public MessageController(DatabaseContext db)
+        public MessageController(ApplicationContext context, EventLogger eventLogger)
         {
-            EventLogger.AddClass<MessageController>();
-            EventLogger.LogDebug("Initialization MessageController");
+            _eventLogger = eventLogger;
+            _context = context;
+
+            _eventLogger.AddClass<MessageController>();
+            _eventLogger.LogDebug("Initialization MessageController");
             
-            _db = db;
         }
         
         [HttpPost]
@@ -33,20 +35,20 @@ namespace FreebieBot.Controllers
                 var commands = Bot.Commands;
                 var botClient = Bot.GetBotClientAsync();
 
-                EventLogger.LogDebug($"Received {message.Type}", message.From.Id.ToString());
+                _eventLogger.LogDebug($"Received {message.Type}", message.From.Id.ToString());
 
                 foreach (var command in commands)
                 {
                     if (command.Contains(message))
                     {
-                        await command.Execute(message, await botClient, _db);
+                        await command.Execute(message, await botClient, _context);
                         break;
                     }
                 }
             }
             catch (Exception e)
             {
-                EventLogger.LogError(e, message.From.Id.ToString());
+                _eventLogger.LogError(e, message.From.Id.ToString());
             }
             
             return Ok();

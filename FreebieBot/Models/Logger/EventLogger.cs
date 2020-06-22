@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using FreebieBot.Models.Database;
-using FreebieBot.Models.Logger;
 
 namespace FreebieBot.Models.Logger
 {
     public class EventLogger
     {
-        private DatabaseContext _db;
+        private ApplicationContext _db;
         private LoggerLevel _level;
         private string _className;
 
-        public EventLogger(DatabaseContext db)
+        public EventLogger(ApplicationContext db)
         {
             _db = db;
             Enum.TryParse(AppSettings.LoggerLevel, out _level);

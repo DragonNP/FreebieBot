@@ -9,7 +9,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
     {
         public abstract string Name { get; }
         public abstract bool Contains(Message message);
-        public abstract Task Execute(Message message, TelegramBotClient client, DatabaseContext db);
+        public abstract Task Execute(Message message, TelegramBotClient client, ApplicationContext db);
 
     }
 }

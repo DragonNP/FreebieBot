@@ -28,7 +28,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
             return message.Text.Contains(Name);
         }
 
-        public override async Task Execute(Message message, TelegramBotClient botClient, DatabaseContext db)
+        public override async Task Execute(Message message, TelegramBotClient botClient, ApplicationContext db)
         {
             try
             {

@@ -10,22 +10,22 @@ namespace FreebieBot.Controllers
     public class AdminController : Controller
     {
         private readonly EventLogger _eventLogger;
-        private readonly DatabaseContext _db;
+        private readonly ApplicationContext _context;
 
-        public AdminController(DatabaseContext db, EventLogger eventLogger)
+        public AdminController(ApplicationContext context, EventLogger eventLogger)
         {
             _eventLogger = eventLogger;
             _eventLogger.AddClass<AdminController>();
             _eventLogger.LogDebug("Initialization AdminController");
             
-            _db = db;
+            _context = context;
         }
         
         [HttpGet]
         public async Task<IActionResult> Translate()
         {
             _eventLogger.LogDebug("/Home/TranslateView page visited");
-            return View(await _db.Lines.ToListAsync());
+            return View(await _context.Lines.ToListAsync());
         }
         
         [HttpGet]
@@ -40,8 +40,8 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Adding new translate");
             
-            _db.Lines.Add(line);
-            await _db.SaveChangesAsync();
+            _context.Lines.Add(line);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Translate");
         }
         
@@ -50,15 +50,15 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Deleting translate");
             
-            var line = await _db.Lines.FindAsync(name);
+            var line = await _context.Lines.FindAsync(name);
 
             if (line == null)
             {
                 return RedirectToAction("Translate");
             }
 
-            _db.Lines.Remove(line);
-            await _db.SaveChangesAsync();
+            _context.Lines.Remove(line);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Translate");
         }
         
@@ -67,7 +67,7 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogDebug("/Home/TranslateEdit page visited");
             
-            var line = await _db.Lines.FindAsync(name);
+            var line = await _context.Lines.FindAsync(name);
             
             if (line == null)
             {
@@ -82,8 +82,8 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Editing translate");
             
-            _db.Lines.Update(line);
-            await _db.SaveChangesAsync();
+            _context.Lines.Update(line);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Translate");
         }
         
@@ -91,7 +91,7 @@ namespace FreebieBot.Controllers
         public async Task<IActionResult> EventLog()
         {
             _eventLogger.LogDebug("/Home/EventLog page visited");
-            return View(await _db.EventLogs.ToListAsync());
+            return View(await _context.EventLogs.ToListAsync());
         }
         
         [HttpPost]
@@ -99,7 +99,7 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Clearing Event Logs");
 
-            await _db.Database.ExecuteSqlRawAsync("Truncate table EventLogs");
+            await _context.Database.ExecuteSqlRawAsync("Truncate table EventLogs");
             return RedirectToAction("EventLog");
         }
 
@@ -107,7 +107,7 @@ namespace FreebieBot.Controllers
         public async Task<IActionResult> Users()
         {
             _eventLogger.LogDebug("/Home/Users page visited");
-            return View(await _db.Users.ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
         [HttpGet]
@@ -115,7 +115,7 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogDebug("/Home/UserEdit page visited", id);
             
-            var user = await _db.Users.FindAsync(Convert.ToInt64(id));
+            var user = await _context.Users.FindAsync(Convert.ToInt64(id));
 
             if (user == null)
             {
@@ -130,8 +130,8 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Editing User", user.Id.ToString());
             
-            _db.Users.Update(user);
-            await _db.SaveChangesAsync();
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Users");
         }
         
@@ -140,15 +140,15 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Deleting User", id);
             
-            var user = await _db.Users.FindAsync(Convert.ToInt64(id));
+            var user = await _context.Users.FindAsync(Convert.ToInt64(id));
 
             if (user == null)
             {
                 return RedirectToAction("Users");
             }
 
-            _db.Users.Remove(user);
-            await _db.SaveChangesAsync();
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
             return RedirectToAction("Users");
         }
     }

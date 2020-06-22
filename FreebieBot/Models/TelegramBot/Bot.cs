@@ -34,13 +34,14 @@ namespace FreebieBot.Models.TelegramBot
                 }
                 else
                 {
+                    // Using Proxy
                     var proxy = new HttpToSocks5Proxy(AppSettings.ProxyHost, AppSettings.ProxyPort);
                     _botClient = new TelegramBotClient(AppSettings.TelegramToken, proxy);
 
                     EventLogger.LogInfo("Bot using WebHook and proxy");
                 }
 
-                // WebHook
+                // Using WebHook
                 var url = Environment.GetEnvironmentVariable("URL_ENVIRONMENT");
                 var hook = $"{url}/api/message/update";
                 await _botClient.SetWebhookAsync(hook);

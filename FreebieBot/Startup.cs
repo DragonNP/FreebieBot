@@ -1,7 +1,9 @@
+using System.Timers;
 using FreebieBot.Models;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Logger;
 using FreebieBot.Models.TelegramBot;
+using FreebieBot.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,10 +25,13 @@ namespace FreebieBot
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DatabaseContext>(options =>
+            // Adding Database context
+            services.AddDbContext<ApplicationContext>(options =>
                 options.UseSqlServer(AppSettings.UrlDatabase));
 
+            // Adding Custom Logger
             services.AddTransient<EventLogger>();
+            services.AddHostedService<FreebieHostedService>();
             services.AddControllersWithViews().AddNewtonsoftJson();
         }
 
