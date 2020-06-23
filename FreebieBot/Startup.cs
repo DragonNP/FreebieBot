@@ -28,6 +28,7 @@ namespace FreebieBot
                 options.UseSqlServer(AppSettings.UrlDatabase));
 
             services.AddScoped<EventLoggerService>(); // Logger
+            services.AddScoped<TelegramMarkupsService>(); // Telegram markups
             services.AddSingleton<TelegramBotService>(); // Telegram Bot
             services.AddTransient<Parser>(); // Parser for FreebieHostedService
             services.AddHostedService<FreebieHostedService>(); // Search freebies 

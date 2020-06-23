@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FreebieBot.Models;
 using FreebieBot.Models.TelegramBot.Commands;
+using FreebieBot.Models.TelegramBot.TextCommands;
 using MihaZupan;
 using Telegram.Bot;
 
@@ -11,9 +12,11 @@ namespace FreebieBot.Services
     {
         private static TelegramBotClient _botClient;
         private static List<Command> _commandsList;
+        private static List<TextCommand> _textCommandsList;
         private static EventLoggerService _eventLogger;
 
         public IReadOnlyList<Command> Commands => _commandsList.AsReadOnly();
+        public IReadOnlyList<TextCommand> TextCommands => _textCommandsList.AsReadOnly();
 
         /// <summary>
         /// Initialization Telegram Bot
@@ -55,7 +58,6 @@ namespace FreebieBot.Services
                 // Logging
                 var me = _botClient.GetMeAsync().Result;
                 _eventLogger.LogDebug($"Bot id {me.Id}. Bot name {me.FirstName}");
-
             }
             catch (Exception e)
             {
@@ -78,8 +80,14 @@ namespace FreebieBot.Services
         private static void InitCommandsList()
         {
             _commandsList = new List<Command>();
-            _commandsList.Add(new StartCommand(_eventLogger));
-            //TODO: Add more commands
+            _commandsList.Add(new StartCommand());
+            
+            _textCommandsList = new List<TextCommand>();
+            _textCommandsList.Add(new BackTextCommand());
+            _textCommandsList.Add(new SettingsCommand());
+            _textCommandsList.Add(new SubscribePikabuCommand());
+            _textCommandsList.Add(new UnsubscribePikabuCommand());
+            _textCommandsList.Add(new DelAccountTextCommands());
         }
     }
 }

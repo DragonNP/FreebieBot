@@ -38,12 +38,12 @@ namespace FreebieBot.Models
 
             var story = _stories.Select(".story");
 
-            if (story[0].ClassName == "story story_tags-at-top")
-                return null;
+            if (story[0].ClassName != "story") return null;
 
             var id = Convert.ToInt64(story[0].GetAttribute("data-story-id"));
 
             var aElement = story.Find(".story__title-link")[0];
+            if (aElement == null) return null;
             var name = HttpUtility.HtmlDecode(aElement.InnerText);
             var url = aElement.GetAttribute("href");
 

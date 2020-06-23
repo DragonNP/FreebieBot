@@ -74,25 +74,26 @@ namespace FreebieBot.Services
                     DateTime = postPikabu.DateTime
                 });
                 
-                // Finding next post from Pikabu 
+                
+                // Finding next post from Pikabu
                 postPikabu = parser.NextPikabuPost();
             }
 
             if (pikabuFreebies.Count == 0) return;
             // Searching users with Pikabu subscription
             var users = _context.Users.Where(p => p.SubPikabu == UserSub.Yes);
-            SendTelegramMessage(users, pikabuFreebies);
+            SendTelegramMessage(users, pikabuFreebies).Wait();
             
             _context.SaveChangesAsync(); // Saving updates to database
         }
 
-        private void SendTelegramMessage(IQueryable<User> users, List<Line> lines)
+        private async Task SendTelegramMessage(IQueryable<User> users, List<Line> lines)
         {
             foreach (var user in users)
             {
                 foreach (var line in lines)
                 {
-                    _telegramBot.SendTextMessageAsync(user.Id, user.Lang == UserLang.def ? line.Default : line.LineRus);
+                    await _telegramBot.SendTextMessageAsync(user.TelegramId, user.Lang == UserLang.def ? line.Default : line.LineRus);
                 }
             }
         }

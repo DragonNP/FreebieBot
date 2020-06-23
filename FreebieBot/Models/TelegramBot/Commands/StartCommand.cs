@@ -13,13 +13,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
 {
     public class StartCommand : Command
     {
-        private readonly EventLoggerService _eventLogger;
-        public override string Name => @"/start";
-
-        public StartCommand(EventLoggerService eventLogger)
-        {
-            _eventLogger = eventLogger;
-        }
+        public override string Name { get; } = @"/start";
 
         /// <summary>
         /// If text from message == name command
@@ -33,7 +27,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
 
             return message.Text.Contains(Name);
         }
-        
+
         /// <summary>
         /// Executing command 
         /// </summary>
@@ -41,33 +35,30 @@ namespace FreebieBot.Models.TelegramBot.Commands
         /// <param name="botClient">Bot Client</param>
         /// <param name="context">DB Context</param>
         /// <returns></returns>
-        public override async Task Execute(Message message, TelegramBotClient botClient, ApplicationContext context)
+        public override async Task Execute(Message message, TelegramBotClient botClient, ApplicationContext context,
+            TelegramMarkupsService markups)
         {
-            try
-            {
-                var chat = message.Chat;
-                var lang = message.From.LanguageCode;
+            var chat = message.Chat;
+            var lang = message.From.LanguageCode;
 
-                Enum.TryParse(lang, out UserLang userLang);
+            Enum.TryParse(lang, out UserLang userLang);
 
-                // Add new user
-                var newUser = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
-                var line = context.Lines.Find("hello");
-                var helloText = lang == "ru" ? line.LineRus : line.Default;
-                var isNew = !context.Users.Any(p => p.TelegramId == chat.Id);
-                
-                if (isNew)
-                {
-                    await context.Users.AddAsync(newUser);
-                    await context.SaveChangesAsync();
-                }
-                
-                await botClient.SendTextMessageAsync(chat.Id, string.Format(helloText, newUser.Name));
-            }
-            catch (Exception e)
+
+            var line = await context.Lines.FindAsync("hello");
+            var helloText = lang == "ru" ? line.LineRus : line.Default;
+
+            // Add new user
+            var newUser = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
+            var isNew = !context.Users.Any(p => p.TelegramId == chat.Id);
+
+            if (isNew)
             {
-                _eventLogger.LogError(e, Convert.ToString(message.Chat.Id));
+                await context.Users.AddAsync(newUser);
+                await context.SaveChangesAsync();
             }
+
+            await botClient.SendTextMessageAsync(chat.Id, string.Format(helloText, newUser.Name),
+                replyMarkup: markups.GetMainMarkup(userLang));
         }
     }
 }
