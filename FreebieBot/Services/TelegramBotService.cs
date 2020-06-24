@@ -90,6 +90,7 @@ namespace FreebieBot.Services
             _textCommandsList.Add(new DelAccountTextCommands());
             _textCommandsList.Add(new LanguagesTextCommand());
             _textCommandsList.Add(new SendLastFreebiePikabu());
+            _textCommandsList.Add(new HowToUse());
         }
     }
 }

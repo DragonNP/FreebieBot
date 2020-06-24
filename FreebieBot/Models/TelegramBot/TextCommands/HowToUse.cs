@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Translates;
@@ -9,7 +10,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace FreebieBot.Models.TelegramBot.TextCommands
 {
-    public class DelAccountTextCommands : TextCommand
+    public class HowToUse : TextCommand
     {
         protected override Line Name { get; set; }
         public override async Task<bool> Contains(Message message, ApplicationContext context)
@@ -24,7 +25,7 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
             if (user == null) return false;
 
             if (Name == null)
-                Name = await context.Lines.FindAsync("deleteAccount");
+                Name = await context.Lines.FindAsync("howToUse");
             return Name.Contains(message.Text);
         }
 
@@ -37,11 +38,9 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
             // If user not registered
             if (user == null) return;
 
-            var deletedAccount = (await context.Lines.FindAsync("deletedAccount")).GetTranslate(user.Lang);
-            context.Users.Remove(user);
-            
-            await client.SendTextMessageAsync(user.TelegramId, deletedAccount, replyMarkup: markups.GetStartMarkup());
-            await context.SaveChangesAsync();
+            var instructionLine = await context.Lines.FindAsync("instruction");
+            var instruction = instructionLine.GetTranslate(user.Lang);
+            await client.SendTextMessageAsync(user.TelegramId, instruction, replyMarkup: markups.GetMainMarkup(user.Lang));
         }
     }
 }

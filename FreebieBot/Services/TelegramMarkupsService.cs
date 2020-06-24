@@ -18,9 +18,13 @@ namespace FreebieBot.Services
         public IReplyMarkup GetMainMarkup(UserLang lang)
         {
             var keyboard = new List<List<KeyboardButton>>();
+            
             var line1 = new List<KeyboardButton>();
+            var howToUse = _context.Lines.Find("howToUse").GetTranslate(lang);
             var settings = _context.Lines.Find("settings").GetTranslate(lang);
+            line1.Add(howToUse);
             line1.Add(settings);
+
             keyboard.Add(line1);
 
             IReplyMarkup mainMarkup = new ReplyKeyboardMarkup(keyboard, true);
