@@ -93,7 +93,7 @@ namespace FreebieBot.Services
             {
                 foreach (var line in lines)
                 {
-                    await _telegramBot.SendTextMessageAsync(user.TelegramId, user.Lang == UserLang.def ? line.Default : line.LineRus);
+                    await _telegramBot.SendTextMessageAsync(user.TelegramId, user.Lang == UserLang.en ? line.Default : line.LineRus);
                 }
             }
         }

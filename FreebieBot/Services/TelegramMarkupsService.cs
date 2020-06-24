@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FreebieBot.Models.Database;
 using FreebieBot.Models.Users;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -35,16 +36,22 @@ namespace FreebieBot.Services
             var subUnSubPikabu = string.Format(_context.Lines.Find(paramLine).GetTranslate(user.Lang), "Pikabu");
             line.Add(subUnSubPikabu);
             keyboard.Add(line);
-
+            
             var line2 = new List<KeyboardButton>();
+            paramLine = "changeLanguage";
+            var changeLang = _context.Lines.Find(paramLine).GetTranslate(user.Lang);
+            line2.Add(changeLang);
+            keyboard.Add(line2);
+
+            var line3 = new List<KeyboardButton>();
             paramLine = "back";
             var back = _context.Lines.Find(paramLine).GetTranslate(user.Lang);
-            line2.Add(back);
+            line3.Add(back);
             paramLine = "deleteAccount";
             var deleteAccount = _context.Lines.Find(paramLine).GetTranslate(user.Lang);
-            line2.Add(deleteAccount);
+            line3.Add(deleteAccount);
             
-            keyboard.Add(line2);
+            keyboard.Add(line3);
 
             IReplyMarkup settingsMarkup = new ReplyKeyboardMarkup(keyboard, true);
             return settingsMarkup;
@@ -56,6 +63,20 @@ namespace FreebieBot.Services
             var line1 = new List<KeyboardButton>();
             line1.Add("/start");
             keyboard.Add(line1);
+            
+            return new ReplyKeyboardMarkup(keyboard, true);
+        }
+
+        public IReplyMarkup GetLanguageMarkup()
+        {
+            var keyboard = new List<List<KeyboardButton>>();
+            
+            foreach( UserLang lang in Enum.GetValues(typeof(UserLang)))
+            {
+                var line1 = new List<KeyboardButton>();
+                line1.Add(lang.ToString());
+                keyboard.Add(line1);
+            }
             
             return new ReplyKeyboardMarkup(keyboard, true);
         }

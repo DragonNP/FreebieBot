@@ -4,6 +4,5 @@
     {
         en, // English
         ru, // Russian
-        def = en // Default is English
     }
 }
