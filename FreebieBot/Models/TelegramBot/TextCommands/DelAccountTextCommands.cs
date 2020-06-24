@@ -25,9 +25,7 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
 
             if (Name == null)
                 Name = await context.Lines.FindAsync("deleteAccount");
-            var deleteAccount = Name.GetTranslate(user.Lang);
-            
-            return message.Text.Contains(deleteAccount);
+            return Name.Contains(message.Text);
         }
 
         public override async Task Execute(Message message, TelegramBotClient client, ApplicationContext context,

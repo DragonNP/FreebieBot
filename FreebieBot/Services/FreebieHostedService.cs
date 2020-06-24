@@ -50,7 +50,7 @@ namespace FreebieBot.Services
 
             var pikabuFreebies = new List<Line>();
 
-            // If new freebie from pikabu is no, that continuing the cycle
+            // If new freebie from pikabu is not empty, that continuing the cycle
             while (postPikabu != null && !_context.Posts.Any(p => p.Type == postPikabu.Type && p.Id == postPikabu.Id))
             {
                 var pattern = _context.Lines.Find("newFreebie"); // Finding pattern for translate

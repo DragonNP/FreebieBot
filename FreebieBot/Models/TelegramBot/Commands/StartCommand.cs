@@ -34,6 +34,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
         /// <param name="message">Message from user</param>
         /// <param name="botClient">Bot Client</param>
         /// <param name="context">DB Context</param>
+        /// <param name="markups">Keyboards</param>
         /// <returns></returns>
         public override async Task Execute(Message message, TelegramBotClient botClient, ApplicationContext context,
             TelegramMarkupsService markups)
@@ -45,7 +46,7 @@ namespace FreebieBot.Models.TelegramBot.Commands
 
 
             var line = await context.Lines.FindAsync("hello");
-            var helloText = lang == "ru" ? line.LineRus : line.Default;
+            var helloText = line.GetTranslate(userLang);
 
             // Add new user
             var newUser = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};

@@ -31,14 +31,13 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
 
             if (Name == null)
                 Name = await context.Lines.FindAsync("changeLanguage");
+            
             if (Langs.Count == 0)
             {
                 foreach (UserLang lang in Enum.GetValues(typeof(UserLang)))
                     Langs.Add(lang.ToString());
             }
-            
-            var changeLanguage = Name.GetTranslate(user.Lang);
-            return message.Text.Contains(changeLanguage) || Langs.Contains(message.Text);
+            return Name.Contains(message.Text);
         }
 
         public override async Task Execute(Message message, TelegramBotClient client, ApplicationContext context, TelegramMarkupsService markups)

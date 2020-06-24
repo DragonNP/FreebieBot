@@ -24,20 +24,11 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
             var chat = message.Chat;
             var user = context.Users.FirstOrDefault(usr => usr.TelegramId == chat.Id); // Finding user in database
             // If user not registered
-            if (user == null)
-            {
-                var lang = message.From.LanguageCode;
-
-                Enum.TryParse(lang, out UserLang userLang);
-                
-                user = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
-                await context.Users.AddAsync(user);
-            }
+            if (user == null) return false;
 
             if (Name == null)
                 Name = await context.Lines.FindAsync("settings");
-            var settings = Name.GetTranslate(user.Lang);
-            return message.Text.Contains(settings);
+            return Name.Contains(message.Text);
         }
 
         public override async Task Execute(Message message, TelegramBotClient client, ApplicationContext context, TelegramMarkupsService markups)
@@ -46,16 +37,7 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
             var user = context.Users.FirstOrDefault(usr => usr.TelegramId == chat.Id); // Finding user in database
             
             // If user not registered
-            if (user == null)
-            {
-                var lang = message.From.LanguageCode;
-
-                Enum.TryParse(lang, out UserLang userLang);
-                
-                user = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
-                await context.Users.AddAsync(user);
-                await context.SaveChangesAsync();
-            }
+            if (user == null) return;
             
             if (Name == null)
                 Name = await context.Lines.FindAsync("settings");
