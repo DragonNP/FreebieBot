@@ -42,6 +42,9 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Adding new translate");
             
+            line.Default = line.Default.Replace("\\n", "\n");
+            line.LineRus = line.LineRus.Replace("\\n", "\n");
+
             _context.Lines.Add(line);
             await _context.SaveChangesAsync();
             return RedirectToAction("Translate");
@@ -72,9 +75,7 @@ namespace FreebieBot.Controllers
             var line = await _context.Lines.FindAsync(name);
             
             if (line == null)
-            {
                 return RedirectToAction("Translate");
-            }
             
             return View(line);
         }
@@ -84,6 +85,9 @@ namespace FreebieBot.Controllers
         {
             _eventLogger.LogInfo("Editing translate");
             
+            line.Default = line.Default.Replace("\\n", "\n");
+            line.LineRus = line.LineRus.Replace("\\n", "\n");
+
             _context.Lines.Update(line);
             await _context.SaveChangesAsync();
             return RedirectToAction("Translate");

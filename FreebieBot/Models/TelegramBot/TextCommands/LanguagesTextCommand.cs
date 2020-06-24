@@ -37,7 +37,7 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
                 foreach (UserLang lang in Enum.GetValues(typeof(UserLang)))
                     Langs.Add(lang.ToString());
             }
-            return Name.Contains(message.Text);
+            return Name.Contains(message.Text) || Langs.Contains(message.Text);
         }
 
         public override async Task Execute(Message message, TelegramBotClient client, ApplicationContext context, TelegramMarkupsService markups)

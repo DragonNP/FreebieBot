@@ -42,24 +42,22 @@ namespace FreebieBot.Models.TelegramBot.Commands
             var chat = message.Chat;
             var lang = message.From.LanguageCode;
 
-            Enum.TryParse(lang, out UserLang userLang);
-
-
-            var line = await context.Lines.FindAsync("hello");
-            var helloText = line.GetTranslate(userLang);
-
             // Add new user
-            var newUser = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
-            var isNew = !context.Users.Any(p => p.TelegramId == chat.Id);
+            var user = context.Users.FirstOrDefault(p => p.TelegramId == chat.Id);
 
-            if (isNew)
+            if (user == null)
             {
-                await context.Users.AddAsync(newUser);
+                Enum.TryParse(lang, out UserLang userLang);
+                user = new User() {TelegramId = chat.Id, Name = chat.FirstName, Lang = userLang};
+                await context.Users.AddAsync(user);
                 await context.SaveChangesAsync();
             }
+            
+            var line = await context.Lines.FindAsync("hello");
+            var helloText = line.GetTranslate(user.Lang);
 
-            await botClient.SendTextMessageAsync(chat.Id, string.Format(helloText, newUser.Name),
-                replyMarkup: markups.GetMainMarkup(userLang));
+            await botClient.SendTextMessageAsync(chat.Id, string.Format(helloText, user.Name),
+                replyMarkup: markups.GetMainMarkup(user.Lang));
         }
     }
 }

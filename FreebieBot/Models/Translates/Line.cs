@@ -37,7 +37,7 @@ namespace FreebieBot.Models.Translates
             return Translates;
         }
 
-        public bool Contains(string text)
+        public bool Contains(string text, params object[] args)
         {
             return GetTranslates().Contains(text);
         }

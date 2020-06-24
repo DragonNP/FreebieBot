@@ -56,9 +56,9 @@ namespace FreebieBot.Services
                 var pattern = _context.Lines.Find("newFreebie"); // Finding pattern for translate
                 var line = new Line() // Creating translate
                 {
-                    Default = string.Format(pattern.Default.Replace("\\n", "\n"), PostType.Pikabu, postPikabu.Name,
+                    Default = string.Format(pattern.Default, PostType.Pikabu, postPikabu.Name,
                         postPikabu.Url),
-                    LineRus = string.Format(pattern.LineRus.Replace("\\n", "\n"), PostType.Pikabu, postPikabu.Name,
+                    LineRus = string.Format(pattern.LineRus, PostType.Pikabu, postPikabu.Name,
                         postPikabu.Url)
                 };
                 

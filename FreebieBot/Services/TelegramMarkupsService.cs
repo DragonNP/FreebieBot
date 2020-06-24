@@ -35,6 +35,12 @@ namespace FreebieBot.Services
             var paramLine = user.SubPikabu == UserSub.Yes ? "unsubscribeFrom" : "subscribeTo";
             var subUnSubPikabu = string.Format(_context.Lines.Find(paramLine).GetTranslate(user.Lang), "Pikabu");
             line.Add(subUnSubPikabu);
+            if (user.SubPikabu == UserSub.Yes)
+            {
+                paramLine = "sendLastFreebie";
+                var sendLastFreebie = string.Format(_context.Lines.Find(paramLine).GetTranslate(user.Lang), "Pikabu");
+                line.Add(sendLastFreebie);
+            }
             keyboard.Add(line);
             
             var line2 = new List<KeyboardButton>();

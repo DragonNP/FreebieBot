@@ -29,7 +29,7 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
 
             if (Name == null)
                 Name = await context.Lines.FindAsync("subscribeTo");
-            return Name.Contains(message.Text);
+            return Name.Contains(message.Text.Replace("Pikabu", "{0}"));
         }
 
         public override async Task Execute(Message message, TelegramBotClient client, ApplicationContext context, TelegramMarkupsService markups)

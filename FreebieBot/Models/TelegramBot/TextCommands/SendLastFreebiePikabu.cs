@@ -1,21 +1,20 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using FreebieBot.Models.Database;
+using FreebieBot.Models.Posts;
 using FreebieBot.Models.Translates;
-using FreebieBot.Models.Users;
 using FreebieBot.Services;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using User = FreebieBot.Models.Users.User;
 
 namespace FreebieBot.Models.TelegramBot.TextCommands
 {
-    public class UnsubscribePikabuCommand : TextCommand
+    public class SendLastFreebiePikabu : TextCommand
     {
         protected override Line Name { get; set; }
-
+        private Line NewFreebie { get; set; }
         public override async Task<bool> Contains(Message message, ApplicationContext context)
         {
             if (message.Type != MessageType.Text)
@@ -28,7 +27,7 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
             if (user == null) return false;
 
             if (Name == null)
-                Name = await context.Lines.FindAsync("unsubscribeFrom");
+                Name = await context.Lines.FindAsync("sendLastFreebie");
             return Name.Contains(message.Text.Replace("Pikabu", "{0}"));
         }
 
@@ -40,15 +39,17 @@ namespace FreebieBot.Models.TelegramBot.TextCommands
             // If user not registered
             if (user == null) return;
             
-            var unsubscribedFrom = (await context.Lines.FindAsync("unsubscribedFrom"))
-                .GetTranslate(user.Lang);
-            
-            user.SubPikabu = UserSub.No;
-            context.Users.Update(user);
-            
-            await client.SendTextMessageAsync(user.TelegramId, string.Format(unsubscribedFrom, "Pikabu"),
-                replyMarkup: markups.GetSettingsMarkup(user));
-            await context.SaveChangesAsync();
+            if (NewFreebie == null)
+                NewFreebie = await context.Lines.FindAsync("newFreebie");
+            var newFreebie = NewFreebie.GetTranslate(user.Lang);
+
+            var post = await context.Posts
+                .Where(pst => pst.Type == PostType.Pikabu).
+                OrderByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+            newFreebie = string.Format(newFreebie, post.Type, post.Name, post.Url);
+
+            await client.SendTextMessageAsync(user.TelegramId, newFreebie, replyMarkup: markups.GetSettingsMarkup(user));
         }
     }
 }
